@@ -1,41 +1,152 @@
-import React from 'react';
-import { Form, Button } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Form, Button } from "react-bootstrap";
+import ErrorMessage from "../../components/ErrorMessage";
+import Loading from "../../components/Loading";
+import axios from "axios";
 
 function RegistrationScreen() {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [pic, setPic] = useState(
+    "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
+  );
+  const [password, setPassword] = useState("");
+  const [confirmpassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [picMessage, setPicMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState("");
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (password !== confirmpassword) {
+      setMessage("Passwords do not match");
+    } else {
+      setMessage(null);
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+
+        setLoading(true);
+
+        const { data } = await axios.post(
+          "/api/users",
+          {
+            name,
+            pic,
+            email,
+            password,
+          },
+          config
+        );
+
+        setLoading(false);
+        localStorage.setItem("userInfo", JSON.stringify(data));
+      } catch (error) {
+        setError(error.response.data.message);
+      }
+    }
+    console.log(email);
+  };
+
+  const postDetails = (pics) => {
+    if(!pics){
+      return setPicMessage("please select an image")
+    }
+    setPicMessage(null)
+
+    if (pics.type === 'image/jpeg' || pics.type === 'image/png'){
+      const data = new FormData()
+      data.append('file', pics)
+      data.append('upload_preset','noteapp')
+      data.append('cloud_name','dimxtmjra')
+      fetch("https://api.cloudinary.com/v1_1/dimxtmjra/image/upload", {
+        method: "post",
+        body: data,
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        setPic(data.url.toString());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    return setPicMessage("Please Select an Image");
+  }
+};
+
   return (
-    <Form>
-      <Form.Group controlId="formBasicName">
-        <Form.Label>Name</Form.Label>
-        <Form.Control type="text" placeholder="Enter your name" />
-      </Form.Group>
+    <div>
+      {message && <ErrorMessage variant="danger">{error}</ErrorMessage>}
+      {message && <ErrorMessage variant="danger">{message}</ErrorMessage>}
+      {loading && <Loading />}
+      <Form onSubmit={submitHandler}>
+        <Form.Group controlId="formBasicName">
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            type="text"
+            value={name}
+            placeholder="Enter your name"
+            onChange={(e) => setName(e.target.value)}
+          />
+        </Form.Group>
 
-      <Form.Group controlId="formBasicEmail">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" />
-        <Form.Text className="text-muted">
-          We'll never share your email with anyone else.
-        </Form.Text>
-      </Form.Group>
+        <Form.Group controlId="formBasicEmail">
+          <Form.Label>Email address</Form.Label>
+          <Form.Control
+            type="email"
+            value={email}
+            placeholder="Enter email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-      <Form.Group controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control type="password" placeholder="Password" />
-      </Form.Group>
+          <Form.Text className="text-muted">
+            We'll never share your email with anyone else.
+          </Form.Text>
+        </Form.Group>
 
-      <Form.Group controlId="formBasicConfirmPassword">
-        <Form.Label>Confirm Password</Form.Label>
-        <Form.Control type="password" placeholder="Confirm Password" />
-      </Form.Group>
+        <Form.Group controlId="formBasicPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            value={password}
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Form.Group>
 
-      <Form.Group controlId="formBasicProfilePicture">
-        <Form.Label>Profile Picture</Form.Label>
-        <Form.Control type="file" accept="image/*" />
-      </Form.Group>
+        <Form.Group controlId="formBasicConfirmPassword">
+          <Form.Label>Confirm Password</Form.Label>
+          <Form.Control
+            value={confirmpassword}
+            type="password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm Password"
+          />
+        </Form.Group>
+        {picMessage && (
+          <ErrorMessage variant="danger" >{picMessage}</ErrorMessage>
+        )
 
-      <Button variant="primary" type="submit">
-        Register
-      </Button>
-    </Form>
+        }
+
+        <Form.Group controlId="formBasicProfilePicture">
+          <Form.Label>Profile Picture</Form.Label>
+          <Form.Control 
+          type="file" 
+          accept="image/*"
+          onChange={(e) => postDetails(e.target.files[0])} />
+        </Form.Group>
+
+        <Button variant="primary" type="submit">
+          Register
+        </Button>
+      </Form>
+    </div>
   );
 }
 

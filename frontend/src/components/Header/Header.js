@@ -3,10 +3,13 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Form, FormControl } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import Button from 'react-bootstrap/Button';
 
 function BasicExample() {
+  let navigate = useNavigate();
+
   return (
     <Navbar bg="light" expand="lg">
       <Container>
@@ -32,8 +35,11 @@ function BasicExample() {
             <Nav.Link href="#link">Link</Nav.Link>
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
+              <NavDropdown.Item onClick={()=>{
+                localStorage.removeItem('userInfo')
+                navigate("/")
+              }}>
+              Logout
               </NavDropdown.Item>
               <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
               <NavDropdown.Divider />
