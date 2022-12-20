@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import ErrorMessage from "../../components/ErrorMessage";
 import Loading from "../../components/Loading";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../../actions/userActions";
+import {useNavigate } from "react-router-dom";
 
 function RegistrationScreen() {
+  let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [pic, setPic] = useState(
@@ -14,43 +17,31 @@ function RegistrationScreen() {
   const [confirmpassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [picMessage, setPicMessage] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState("");
+  
+  const dispatch = useDispatch();
+
+  const userRegister = useSelector(state => state.userRegister)
+  const {loading,error, userInfo} = userRegister;
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    if (password !== confirmpassword) {
-      setMessage("Passwords do not match");
-    } else {
-      setMessage(null);
-      try {
-        const config = {
-          headers: {
-            "Content-type": "application/json",
-          },
-        };
 
-        setLoading(true);
-
-        const { data } = await axios.post(
-          "/api/users",
-          {
-            name,
-            pic,
-            email,
-            password,
-          },
-          config
-        );
-
-        setLoading(false);
-        localStorage.setItem("userInfo", JSON.stringify(data));
-      } catch (error) {
-        setError(error.response.data.message);
-      }
+    if (password !== confirmpassword){
+      setMessage('Passwords do not match')
     }
-    console.log(email);
+    else{
+      dispatch(register(name,email,password,pic))
+    }
+    
   };
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+
+    if (userInfo) {
+      navigate("/mynotes");
+    }
+  });
 
   const postDetails = (pics) => {
     if(!pics){

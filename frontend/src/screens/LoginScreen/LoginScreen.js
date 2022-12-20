@@ -1,48 +1,40 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import ErrorMessage from "../../components/ErrorMessage";
 import Loading from "../../components/Loading";
 import MainScreen from "../../components/MainScreen";
+import { login } from "../../actions/userActions";
 
- const LoginScreen = ({history}) => {
+const LoginScreen = ({ history }) => {
+  let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState("");
+  const dispatch = useDispatch();
 
+  const userLogin = useSelector((state) => state.userLogin);
+
+  const { loading, error, userInfo } = userLogin;
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+
+    if (userInfo) {
+      navigate("/mynotes");
+    }
+  });
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      setLoading(true)
-
-      const {data}= await axios.post('/api/users/login',{
-        email,password
-      },
-      config
-      )
-      console.log(data);
-      localStorage.setItem('userInfo', JSON.stringify(data))
-      setLoading(false)
-    } catch (error) {
-        setError(error.response.data.message)
-        setLoading(false)
-    }
-    
+    dispatch(login(email, password));
   };
 
   return (
     <MainScreen title="Login">
-        {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
-        {loading && <Loading/>}
-
+      {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
+      {loading && <Loading />}
 
       <Form className="login-form" onSubmit={submitHandler}>
         <Form.Group controlId="formBasicEmail">
