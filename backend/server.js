@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const noteRoutes = require("./routes/noteRoutes");
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
@@ -18,12 +19,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/api/notes/:id", (req, res) => {
-  const note = notes.find((n) => n._id === req.params.id);
-  res.send(note);
-});
+
 
 app.use("/api/users", userRoutes);
+app.use("/api/notes", noteRoutes);
 
 app.get("/api/notes", cors(), (req, res) => {
   res.json(notes);
