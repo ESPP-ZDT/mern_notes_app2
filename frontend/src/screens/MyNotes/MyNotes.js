@@ -9,7 +9,7 @@ import ErrorMessage from "../../components/ErrorMessage";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteNoteAction, listNotes } from "../../actions/noteActions";
 
-const MyNotes = () => {
+const MyNotes = ({search}) => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -42,7 +42,8 @@ const MyNotes = () => {
       navigate("/");
     }
   }, [dispatch, successCreate,navigate,userInfo ,successUpdate,successDelete]);
-
+  //HERE, WHERE IM FILTERING THE NOTES, IF IM GOING TO MAKE REWIERS, THEN I COULD ADD THE CONTENT OF THE REWIEVS OR OTHER SCHEMA ELEMENTS TO MAKE THE SEARCHING MORE ACCESIBLE
+  //
   return (
     <div>
       <MainScreen title={`Hello user ${userInfo.name}`}>
@@ -53,7 +54,11 @@ const MyNotes = () => {
         </Link>{" "}
         {error && <ErrorMessage variant="danger">{error}</ErrorMessage>}
         {loading && <Loading />}
-        {notes?.reverse().map((note) => (
+        {notes?.reverse().filter(
+          filteredNote=>(
+            filteredNote.title.toLowerCase().includes(search.toLowerCase())
+          )
+        ).map((note) => (
           <Card key={note._id}>
             <Card.Header style={{ display: "flex" }}>
               <span className="reviewtitle">{note.title}</span>

@@ -9,7 +9,7 @@ import { logout } from "../../actions/userActions";
 
 import Button from 'react-bootstrap/Button';
 
-function BasicExample() {
+function BasicExample({setSearch}) {
   let navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -38,6 +38,7 @@ function BasicExample() {
                 type="text"
                 placeholder="Search"
                 className="mr-sm-2"
+                onChange={(e) =>setSearch(e.target.value)}
               />
             </Form>
           </Nav>
