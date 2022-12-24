@@ -42,11 +42,15 @@ function BasicExample({setSearch}) {
               />
             </Form>
           </Nav>
-          <Nav>
-          <Link to="/mynotes">
+          {userInfo? <Nav>
+          <Link to="/profile">
+            <Button variant="primary" size="xs">my profile</Button>
+            
+            </Link>
+            <Link to="/mynotes">
             <Button variant="primary" size="xs">my Notes</Button>{' '}
             </Link>
-            <Nav.Link href="#link">Link</Nav.Link>
+            
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item onClick={logoutHandler}>
@@ -58,7 +62,11 @@ function BasicExample({setSearch}) {
                 Separated link
               </NavDropdown.Item>
             </NavDropdown>
-          </Nav>
+          </Nav>: <Nav>
+          <Link to="/login">
+            <Button variant="primary" size="xs">Login</Button>{' '}
+            </Link>
+            </Nav>}
         </Navbar.Collapse>
       </Container>
     </Navbar>
